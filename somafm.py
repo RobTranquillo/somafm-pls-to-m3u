@@ -2,11 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 
 
-
+#configuration
 source = "http://somafm.com/listen/index.html"
+generateSonataConfig = True #to add in Sonata (~/.config/sonatarc)
+sonataConfigIterator = 13   #number of the next station in config file (starts with zero)
 
 
-
+# main func
+configString = ''
 r = requests.get(source)
 soup = BeautifulSoup(r.text, 'lxml')
 
@@ -22,8 +25,18 @@ for cat in cats:
     link2End = r.text.find('\n', link2Start)
     m3uContent = r.text[ link1Start : link1End ] +'\n'+ r.text[ link2Start : link2End ]
 
-    pl = open('somafm-'+station[1:-4]+'.m3u', 'w')
+    titleStart = r.text.find('Title1=SomaFM:') + 15
+    titleEnd =  r.text.find('(', titleStart)
+    stationTitle = r.text[titleStart : titleEnd].strip()
+
+    if generateSonataConfig:
+      configString = configString + "names["+str(sonataConfigIterator)+"] = soma fm "+stationTitle+"\nuris["+str(sonataConfigIterator)+"] = "+r.text[ link1Start : link1End ]+"\n"
+      sonataConfigIterator += 1
+
+    pl = open('soma fm - '+stationTitle+'.m3u', 'w')
     pl.write(m3uContent)
     pl.close()
 
-    print('wrote '+station);
+    print('wrote '+stationTitle);
+
+print('\n\n' + 'for Sonata Config (edit the interator in the brackets):\n'+configString);
