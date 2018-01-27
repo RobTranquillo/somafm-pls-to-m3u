@@ -1,18 +1,18 @@
 import requests
 from bs4 import BeautifulSoup
-with open("index.html") as fp:
-    soup = BeautifulSoup(fp, 'lxml')
 
-stations = []
-m3uContent = ''
-i=4
 
-stations = soup.find_all('ul')
+
+source = "http://somafm.com/listen/index.html"
+
+
+
+r = requests.get(source)
+soup = BeautifulSoup(r.text, 'lxml')
 
 cats = soup.find_all(name='dl')
 for cat in cats:
     station = cat.dd.a.get('href')
-    stations.append(station)
     link = "https://somafm.com" + station + "\r\n"
 
     r = requests.get(link)
