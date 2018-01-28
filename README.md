@@ -10,8 +10,12 @@ feature activation:
 extend your existing strams list
 - sonataConfigIterator = 13   #number of the next station in your config file (starts with zero)
 
-
-requirements:
+# requirements
 - python3
 - requests
 - BeautifulSoup 4
+
+# how to run
+```
+ $ python3 somafm.py
+```
