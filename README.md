@@ -14,4 +14,3 @@ extend your existing streams list
 requirements:
 - python3
 - requests
-- BeautifulSoup 4
