@@ -25,6 +25,12 @@ def main():
     extendSonata(stations['mp3'], sonataConfigIterator)
 
 
+
+'''
+  Support for the good old Sonata player
+
+  Insert the output to your sonata config to get the playlists to your Sonata
+'''
 def extendSonata(stations, sonataConfigIterator):
   configString = ''
   for station in stations:
