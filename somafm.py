@@ -1,6 +1,4 @@
 import requests
-from bs4 import BeautifulSoup
-
 
 #configuration
 source = "http://somafm.com/listen/index.html"
