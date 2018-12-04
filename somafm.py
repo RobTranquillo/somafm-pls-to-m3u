@@ -4,39 +4,67 @@ from bs4 import BeautifulSoup
 
 #configuration
 source = "http://somafm.com/listen/index.html"
-generateSonataConfig = True #to add in Sonata (~/.config/sonatarc)
-sonataConfigIterator = 13   #number of the next station in config file (starts with zero)
+source = "http://somafm.com/listen/genre.html"
+generateSonataConfig = False #to add in Sonata (~/.config/sonatarc)
+sonataConfigIterator = 0   #number of the next station in config file (starts with zero)
 
+#todo: die Config parameter in der Shell übergeben
 
-# main func
-configString = ''
-r = requests.get(source)
-soup = BeautifulSoup(r.text, 'lxml')
+#### Main
+def main():
+  stations = getStationsByFormat(source)
+  print(str(len(stations['aac'])) + " AAC Listen eingelesen")
+  print(str(len(stations['mp3'])) + " MP3 Listen eingelesen")
 
-cats = soup.find_all(name='dl')
-for cat in cats:
-    station = cat.dd.a.get('href')
-    link = "https://somafm.com" + station + "\r\n"
+  toMultiFile(stations['mp3'], 'somafm-mp3.m3u')
+  toMultiFile(stations['aac'], 'somafm-aac.m3u')
 
-    r = requests.get(link)
-    link1Start = r.text.find('File1=')+6
-    link1End = r.text.find('\n', link1Start)
-    link2Start = r.text.find('File2=')+6
-    link2End = r.text.find('\n', link2Start)
-    m3uContent = r.text[ link1Start : link1End ] +'\n'+ r.text[ link2Start : link2End ]
+  for station in stations['mp3']:
+    toFile(station, 'channel/somafm - '+station['name']+'.m3u')
 
-    titleStart = r.text.find('Title1=SomaFM:') + 15
-    titleEnd =  r.text.find('(', titleStart)
-    stationTitle = r.text[titleStart : titleEnd].strip()
+'''
+  getURLsByFormat
 
-    if generateSonataConfig:
-      configString = configString + "names["+str(sonataConfigIterator)+"] = soma fm "+stationTitle+"\nuris["+str(sonataConfigIterator)+"] = "+r.text[ link1Start : link1End ]+"\n"
-      sonataConfigIterator += 1
+  @param: a url path of a page with links
+  @return: a dict with name and url of a station
+'''
+def getStationsByFormat(source):
+  r = requests.get(source)
+  AACLinks = []
+  MP3Links = []
+  for line in r.text.split('\n'):
+    if '<h3>' in line:
+      headline = line[4:line.find('</h3>')]
+    if '<a href' in line and '.pls' in line:
+      if 'AAC:' in line:
+        AACLinks.append({'name':headline, 'url':scrapeUrl(line)})
+      if 'MP3:' in line:
+        MP3Links.append({'name':headline, 'url':scrapeUrl(line)})
+  return { 'aac' : AACLinks, 'mp3' : MP3Links }
 
-    pl = open('soma fm - '+stationTitle+'.m3u', 'w')
-    pl.write(m3uContent)
-    pl.close()
+def scrapeUrl(line):
+  start = line.find('<a href') +9
+  end = line.find('"',start)
+  return 'https://somafm.com'+line[start:end]
 
-    print('wrote '+stationTitle);
+def toFile(station, filename):
+  all = open(filename, 'w')
+  all.write("#EXTM3U\n\n")
+  all.write("#EXTINF:1,"+station['name']+"\n")
+  all.write(station['url']+ "\n\n")
+  all.close()
+  print('write '+filename)
 
-print('\n\n' + 'for Sonata Config (edit the interator in the brackets):\n'+configString);
+def toMultiFile(stations, filename):
+  success = 0
+  all = open(filename, 'w')
+  all.write("#EXTM3U\n\n")
+  for station in stations:
+    all.write("#EXTINF:"+str(success)+","+station['name']+"\n")
+    all.write(station['url']+ "\n\n")
+    success=success+1
+  all.close()
+  print('write '+str(success)+' stations to '+filename)
+
+#start main function
+main()

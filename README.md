@@ -7,7 +7,7 @@ you can generate entrys for your Sonata config file (commonly: ~/.config/sonata/
 feature activation:
 - generateSonataConfig = True
 
-extend your existing strams list
+extend your existing streams list
 - sonataConfigIterator = 13   #number of the next station in your config file (starts with zero)
 
 
