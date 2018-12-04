@@ -20,6 +20,19 @@ def main():
   for station in stations['mp3']:
     toFile(station, 'channel/somafm - '+station['name']+'.m3u')
 
+
+  if generateSonataConfig:
+    extendSonata(stations['mp3'], sonataConfigIterator)
+
+
+def extendSonata(stations, sonataConfigIterator):
+  configString = ''
+  for station in stations:
+    configString = configString + "names["+str(sonataConfigIterator)+"] = soma fm "+station['name']+"\nuris["+str(sonataConfigIterator)+"] = "+station['url']+"\n"
+    sonataConfigIterator += 1
+  print('\n\n' + 'Put the following lines to ~/.config/sonatarc for Sonata Playlist Support. (To append Sonata List edit the interator in somafm.py):\n'+configString);
+
+
 '''
   getURLsByFormat
 
@@ -60,7 +73,7 @@ def toMultiFile(stations, filename):
   for station in stations:
     all.write("#EXTINF:"+str(success)+","+station['name']+"\n")
     all.write(station['url']+ "\n\n")
-    success=success+1
+    success += 1
   all.close()
   print('write '+str(success)+' stations to '+filename)
 
