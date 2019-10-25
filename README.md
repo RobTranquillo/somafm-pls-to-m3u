@@ -12,11 +12,13 @@ extend your existing streams list
 
 # requirements
 - python3
-- requests
+- python3 -> requests
+- python3 -> os
 
 # how to run
 ```
- git clone repository
- pip install -r requirements.txt
+ First git clone this repository and  step into it..
+ 
+ $ pip install -r requirements.txt
  $ python3 somafm.py
 ```
