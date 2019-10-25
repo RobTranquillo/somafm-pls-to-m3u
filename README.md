@@ -16,5 +16,7 @@ extend your existing streams list
 
 # how to run
 ```
+ git clone repository
+ pip install -r requirements.txt
  $ python3 somafm.py
 ```
