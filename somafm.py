@@ -1,6 +1,8 @@
 import requests
+import os
 
 #configuration
+outputDir = "SomaFM"
 source = "http://somafm.com/listen/index.html"
 source = "http://somafm.com/listen/genre.html"
 generateSonataConfig = False #to add in Sonata (~/.config/sonatarc)
@@ -17,8 +19,17 @@ def main():
   toMultiFile(stations['mp3'], 'somafm-mp3.m3u')
   toMultiFile(stations['aac'], 'somafm-aac.m3u')
 
+  try:
+    os.mkdir(outputDir)
+  except OSError:
+    print ("Creation of the directory %s failed" % outputDir)
+  else:
+    print ("Successfully created the directory %s " % outputDir)
+        
+
+
   for station in stations['mp3']:
-    toFile(station, 'channel/somafm - '+station['name']+'.m3u')
+    toFile(station, outputDir+'/somafm - '+station['name']+'.m3u')
 
 
   if generateSonataConfig:
